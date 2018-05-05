@@ -1,0 +1,403 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta charset="UTF-8">
+    <title>pushBox</title>
+    <link rel="stylesheet" href="//at.alicdn.com/t/font_415648_2g591ywa14z33di.css">
+    <style type='text/css'>
+
+    * {
+        margin: 0;
+        padding: 0;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        -khtml-user-select: none;
+        user-select: none;
+    }
+
+    .music {
+        position: absolute;
+        right: 50px;
+        top: 50px;
+    }
+
+    .element {
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        box-sizing: border-box;
+        border: 1px solid gray;
+    }
+
+    .wall {
+        background:url("./img/tree.png");
+        background-size: contain;
+    }
+
+    .path {
+        background-color: #fff;
+    }
+
+    .box {
+        background:url("./img/box.png");
+        z-index: 100;
+        outline: 1px solid gray;
+        background-size: contain;
+    }
+
+    .person {
+        border-radius:50%;
+        background:url("./img/boy.png");
+        left: 200px;
+        top: 250px;
+        z-index: 100;
+        line-height: 50px;
+        text-align: center;
+        font-size: 16px;
+        color: white;
+        background-size: contain;
+
+    }
+
+    .end {
+        background:url("./img/ba.png");
+        line-height: 50px;
+        text-align: center;
+        font-size: 14px;
+        color: red;
+        background-size: contain;
+    }
+
+    .handle {
+        position: relative;
+        top: 300px;
+        right: 150px;
+    }
+
+    .item {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        line-height: 40px;
+        background: lightskyblue;
+        color: white;
+    }
+
+    .top {
+        right: 40px;
+        bottom: 80px;
+    }
+
+    .bottom {
+        right: 40px;
+        bottom: 0;
+    }
+
+    .left {
+        right: 80px;
+        bottom: 40px;
+    }
+
+    .right {
+        right: 0;
+        bottom: 40px;
+    }
+    h2{
+        position: absolute;
+        top: -180px;
+        right: -80px;
+        font-family: cursive;
+    }
+    </style>
+</head>
+
+<body>
+    <!-- <div class="music">
+        <span style="vertical-align: middle;">背景音乐与控制</span>
+        <audio style="vertical-align: middle;" src="urf.mp3" autoplay controls loop></audio>
+    </div> -->
+    <div id="main">
+        <div class="person element" id="person"></div>
+    </div>
+    <div class="handle" id="handle">
+        <h2>完成👈游戏证明你不是僵尸粉哦</h2>
+        <div class="top item" id="top">⬆︎</div>
+        <div class="bottom item" id="bottom">⬇︎</div>
+        <div class="left item" id="left">⬅︎</div>
+        <div class="right item" id="right">右</div>
+    </div>
+    <script src="https://cdn.bootcss.com/jquery/2.2.4/jquery.min.js"></script>
+    <script type='text/javascript'>
+    var wallArr = [
+            [300, 100],
+            [400, 100],
+            [500, 100],
+            [300, 200],
+            [500, 200],
+            [300, 300],
+            [500, 300],
+            [600, 300],
+            [700, 300],
+            [800, 300],
+            [100, 400],
+            [200, 400],
+            [300, 400],
+            [800, 400],
+            [100, 500],
+            [600, 500],
+            [700, 500],
+            [800, 500],
+            [100, 600],
+            [200, 600],
+            [300, 600],
+            [400, 600],
+            [600, 600],
+            [400, 700],
+            [600, 700],
+            [400, 800],
+            [500, 800],
+            [600, 800]
+        ],
+        pathArr = [
+            [400, 200],
+            [400, 300],
+            [400, 400],
+            [500, 400],
+            [600, 400],
+            [700, 400],
+            [200, 500],
+            [300, 500],
+            [400, 500],
+            [500, 500],
+            [500, 600],
+            [500, 700]
+        ],
+        boxArr = [
+            [400, 400],
+            [500, 400],
+            [300, 500],
+            [500, 600]
+        ],
+        endArr = [
+            [400, 200],
+            [700, 400],
+            [200, 500],
+            [500, 700]
+        ],
+        wall = path = box = end = main = '',
+        $main = $('#main'),
+        $handle = $('#handle'),
+        $person = $('#person');
+    for (var i = 0; i < wallArr.length; i++) {
+        wall += "<div class='wall element' data-type='wall' style='left:" + wallArr[i][0]/2 + "px;top:" + wallArr[i][1]/2 + "px'></div>";
+    }
+    for (var i = 0; i < pathArr.length; i++) {
+        path += "<div class='path element' data-type='path' style='left:" + pathArr[i][0]/2 + "px;top:" + pathArr[i][1]/2 + "px'></div>";
+    }
+    for (var i = 0; i < boxArr.length; i++) {
+        box += "<div class='box element' data-type='box' style='left:" + boxArr[i][0]/2 + "px;top:" + boxArr[i][1]/2 + "px'></div>";
+    }
+    for (var i = 0; i < endArr.length; i++) {
+        end += "<div class='end element' data-type='end' style='left:" + endArr[i][0]/2 + "px;top:" + endArr[i][1]/2 + "px'>end</div>";
+    }
+    main = wall + path + box + end;
+    $main.append(main);
+
+    $handle.on('click', '#top', function() {
+        var left = $person.css('left'),
+            top = parseInt($person.css('top')) - 50 + 'px',
+            direction = 'top';
+        check(left, top, direction);
+    });
+    $handle.on('click', '#bottom', function() {
+        var left = $person.css('left'),
+            top = parseInt($person.css('top')) + 50 + 'px',
+            direction = 'bottom';
+        check(left, top, direction);
+    });
+    $handle.on('click', '#left', function() {
+        var left = parseInt($person.css('left')) - 50 + 'px',
+            top = $person.css('top'),
+            direction = 'left';
+        check(left, top, direction);
+    });
+    $handle.on('click', '#right', function() {
+        var left = parseInt($person.css('left')) + 50 + 'px',
+            top = $person.css('top'),
+            direction = 'right';
+        check(left, top, direction);
+    });
+    $main.on('click', '.box', function() {
+        var $this = $(this),
+            left = $this.css('left'),
+            top = $this.css('top'),
+            elements = getElementsAroundThisPosition(left, top);
+        elements.each(function() {
+            if ($(this).hasClass('person')) {
+                if (left == $person.css('left')) {
+                    if (parseInt(top) > parseInt($person.css('top'))) {
+                        var l = left,
+                            t = parseInt(top) + 50 + 'px',
+                            direction = 'bottom';
+                        if (getElementsInThisPosition(l, t).attr('data-type') === 'path' || getElementsInThisPosition(l, t).attr('data-type') === 'end') {
+                            boxMove($this, left, top, direction);
+                            personMove($person, left, top);
+                        }
+                    } else {
+                        var l = left,
+                            t = parseInt(top) - 50 + 'px',
+                            direction = 'top';
+                        if (getElementsInThisPosition(l, t).attr('data-type') === 'path' || getElementsInThisPosition(l, t).attr('data-type') === 'end') {
+                            boxMove($this, left, top, direction);
+                            personMove($person, left, top);
+                        }
+                    }
+                } else {
+                    if (parseInt(left) > parseInt($person.css('left'))) {
+                        var l = parseInt(left) + 50 + 'px',
+                            t = top,
+                            direction = 'right';
+                        if (getElementsInThisPosition(l, t).attr('data-type') === 'path' || getElementsInThisPosition(l, t).attr('data-type') === 'end') {
+                            boxMove($this, left, top, direction);
+                            personMove($person, left, top);
+                        }
+                    } else {
+                        var l = parseInt(left) - 50 + 'px',
+                            t = top,
+                            direction = 'left';
+                        if (getElementsInThisPosition(l, t).attr('data-type') === 'path' || getElementsInThisPosition(l, t).attr('data-type') === 'end') {
+                            boxMove($this, left, top, direction);
+                            personMove($person, left, top);
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    $main.on('click', '.path,.end', function() {
+        var $this = $(this),
+            left = $this.css('left'),
+            top = $this.css('top'),
+            elements = getElementsAroundThisPosition(left, top);
+        elements.each(function() {
+            if ($(this).hasClass('person')) {
+                personMove($person, left, top);
+            }
+        });
+    });
+
+    function getElementsAroundThisPosition(left, top) {
+        return $('div').filter(function() {
+            var $this = $(this),
+                l = $this.css('left'),
+                t = $this.css('top');
+            return (l == (parseInt(left) - 50 + 'px') && t == top) ||
+                (l == (parseInt(left) + 50 + 'px') && t == top) ||
+                (l == left && t == (parseInt(top) - 50 + 'px')) ||
+                (l == left && t == (parseInt(top) + 50 + 'px'));
+        });
+    }
+
+    function getElementsInThisPosition(left, top) {
+        var ele, element = $('div').filter(function() {
+            return $(this).css('left') == left && $(this).css('top') == top;
+        });
+        if (element.length == 2) {
+            element.each(function() {
+                if ($(this).hasClass('box') || $(this).hasClass('end')) {
+                    return ele = $(this);
+                }
+            })
+        } else if (element.length == 3) {
+            element.each(function() {
+                if ($(this).hasClass('box')) {
+                    return ele = $(this);
+                }
+            })
+        } else {
+            return ele = $(element);
+        }
+        return ele;
+    }
+
+    function check(left, top, direction) {
+        var parameter = getElementsInThisPosition(left, top).attr('data-type');
+        if (parameter === 'path' || parameter === 'end') {
+            personMove($person, left, top);
+        }
+        if (parameter === 'box') {
+            count(direction, left, top);
+            var para = getElementsInThisPosition(l, t).attr('data-type');
+            if (para === 'path' || para === 'end') {
+                boxMove(getElementsInThisPosition(left, top), left, top, direction);
+                personMove($person, left, top);
+            }
+        }
+    }
+
+    function count(direction, left, top) {
+        switch (direction) {
+            case 'top':
+                return t = parseInt(top) - 50 + 'px',
+                    l = left;
+                break;
+            case 'bottom':
+                return t = parseInt(top) + 50 + 'px',
+                    l = left;
+                break;
+            case 'left':
+                return l = parseInt(left) - 50 + 'px',
+                    t = top;
+                break;
+            case 'right':
+                return l = parseInt(left) + 50 + 'px',
+                    t = top;
+                break;
+        }
+    }
+
+    function personMove(element, left, top) {
+        element.css({
+            left: left,
+            top: top
+        });
+    }
+
+    function boxMove(element, left, top, direction) {
+        count(direction, left, top);
+        element.css({
+            left: l,
+            top: t
+        });
+        isEnd();
+    }
+
+    function isEnd() {
+        var k = 0;
+        $('.box').each(function() {
+            var l = parseInt($(this).css('left')),
+                t = parseInt($(this).css('top'));
+            for (var i = 0; i < endArr.length; i++) {
+                if (endArr[i][0]/2 == l && endArr[i][1]/2 == t) {
+                    k++;
+                    if (k == 4) {
+                        setTimeout(function() {
+                            alert('end');
+                        }, 0);
+                    }
+                }
+            }
+        });
+    }
+    </script>
+</body>
+
+</html>
